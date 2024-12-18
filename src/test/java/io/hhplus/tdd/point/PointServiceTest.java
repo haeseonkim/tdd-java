@@ -74,5 +74,18 @@ public class PointServiceTest {
             // then
             assertEquals(expectedHistories, actualHistories);
         }
+
+        @Test
+        void 유저_포인트_히스토리_조회_빈값_반환_성공(){
+            // given
+            long userId = 1L;
+            when(pointHistoryTable.selectAllByUserId(userId)).thenReturn(List.of());
+
+            // when
+            List<PointHistory> actualHistories = pointService.getPointHistory(userId);
+
+            // then
+            assertTrue(actualHistories.isEmpty());
+        }
     }
 }
