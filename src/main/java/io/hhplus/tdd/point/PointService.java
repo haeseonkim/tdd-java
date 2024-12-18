@@ -19,9 +19,6 @@ public class PointService {
     public static final long MAXIMUM_POINT_LIMIT = 100 * 100 * 100;
 
     public UserPoint getUserPoint(Long userId) {
-        // 입력값 확인
-        checkInputValue(userId);
-
         UserPoint userPoint = userPointTable.selectById(userId);
         if(userPoint == null) {
             throw new UserPointNotFoundException(userId);
@@ -30,17 +27,11 @@ public class PointService {
     }
 
     public List<PointHistory> getPointHistory(Long userId) {
-        // 입력값 확인
-        checkInputValue(userId);
-
         return pointHistoryTable.selectAllByUserId(userId);
     }
 
     public UserPoint chargeUserPoint(Long userId, Long newPoint) {
-        // 1. 입력값 확인
-        checkInputValue(userId, newPoint);
-
-        // 2. 포인트 충전
+        // 1. 포인트 충전
         UserPoint userPoint = userPointTable.selectById(userId);
         UserPoint updatedPoint;
 
@@ -54,17 +45,14 @@ public class PointService {
             updatedPoint = userPointTable.insertOrUpdate(userId, totalPoint);
         }
 
-        // 3. 히스토리 insert
+        // 2. 히스토리 insert
         pointHistoryTable.insert(userId, newPoint, TransactionType.CHARGE, System.currentTimeMillis());
 
         return updatedPoint;
     }
 
     public UserPoint unChargeUserPoint(Long userId, Long newPoint) {
-        // 1. 입력값 확인
-        checkInputValue(userId, newPoint);
-
-        // 2. 포인트 사용
+        // 1. 포인트 사용
         UserPoint userPoint = userPointTable.selectById(userId);
         UserPoint updatedPoint;
         if (userPoint == null) {
@@ -77,30 +65,12 @@ public class PointService {
             updatedPoint = userPointTable.insertOrUpdate(userId, totalPoint);
         }
 
-        // 3. 히스토리 insert
+        // 2. 히스토리 insert
         pointHistoryTable.insert(userId, newPoint, TransactionType.CHARGE, System.currentTimeMillis());
 
         return updatedPoint;
     }
 
-    private void checkInputValue(Long userId){
-        if(userId == null){
-            throw new IllegalArgumentException("userId cannot be null");
-        }
-    }
 
-    private void checkInputValue(Long userId, Long newPoint){
-        if (userId == null || newPoint == null) {
-            throw new IllegalArgumentException("userId or amount cannot be null");
-        }
-
-        if (newPoint <= 0) {
-            throw new IllegalArgumentException("amount must be greater than 0");
-        }
-
-        if (userId <= 0) {
-            throw new IllegalArgumentException("userId must be greater than 0");
-        }
-    }
 
 }
