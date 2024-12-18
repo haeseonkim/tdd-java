@@ -45,12 +45,34 @@ public class PointServiceTest {
         void 유저_포인트_조회시_있으면_성공(){
             // given
             UserPoint userPoint = UserPoint.empty(1L);
-
-            // when
             when(userPointTable.selectById(1L)).thenReturn(userPoint);
 
+            // when
+            UserPoint actual = pointService.getUserPoint(1L);
+
             // then
-            assertEquals(userPoint, pointService.getUserPoint(1L));
+            assertEquals(userPoint, actual);
+        }
+    }
+
+    @Nested
+    @DisplayName("유저 포인트 히스토리 조회 서비스 테스트")
+    class GetPointHistoryTest{
+        @Test
+        void 유저_포인트_히스토리_조회_성공() {
+            // given
+            long userId = 1L;
+            List<PointHistory> expectedHistories = List.of(
+                    new PointHistory(1L, userId, 1000L, TransactionType.CHARGE, System.currentTimeMillis()),
+                    new PointHistory(2L, userId, 500L, TransactionType.USE, System.currentTimeMillis())
+            );
+            when(pointHistoryTable.selectAllByUserId(userId)).thenReturn(expectedHistories);
+
+            // when
+            List<PointHistory> actualHistories = pointService.getPointHistory(userId);
+
+            // then
+            assertEquals(expectedHistories, actualHistories);
         }
     }
 }
