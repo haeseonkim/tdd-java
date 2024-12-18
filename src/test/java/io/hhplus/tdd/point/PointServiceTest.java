@@ -11,6 +11,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
@@ -28,16 +30,14 @@ public class PointServiceTest {
 
     @Nested
     @DisplayName("유저 포인트 조회 서비스 테스트")
-    class getUserPointTest{
+    class GetUserPointTest{
         @Test
         void 유저_포인트_조회시_없을때_UserPointNotFoundException() {
             // given
             long userId = 1L;
-
-            // when
             when(userPointTable.selectById(userId)).thenReturn(null);
 
-            // then
+            // when & then
             assertThrows(UserPointNotFoundException.class, () -> pointService.getUserPoint(userId));
         }
 
