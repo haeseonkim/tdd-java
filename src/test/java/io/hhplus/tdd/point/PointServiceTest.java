@@ -11,7 +11,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,6 +39,18 @@ public class PointServiceTest {
 
             // then
             assertThrows(UserPointNotFoundException.class, () -> pointService.getUserPoint(userId));
+        }
+
+        @Test
+        void 유저_포인트_조회시_있으면_성공(){
+            // given
+            UserPoint userPoint = UserPoint.empty(1L);
+
+            // when
+            when(userPointTable.selectById(1L)).thenReturn(userPoint);
+
+            // then
+            assertEquals(userPoint, pointService.getUserPoint(1L));
         }
     }
 }
