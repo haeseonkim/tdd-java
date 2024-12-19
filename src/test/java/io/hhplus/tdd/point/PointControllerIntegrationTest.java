@@ -63,27 +63,45 @@ public class PointControllerIntegrationTest {
                 .andExpect(jsonPath("$").isArray());
     }
 
+    @Test
+    void 충전_서비스_호출() throws Exception {
+        // given
+        long userId = 1L;
+        long amount = 500L;
+        long initPoint = pointServiceFacade.getUserPoint(userId).point();
+
+        // 단순 숫자를 요청 바디로 전달
+        String plainRequestBody = String.valueOf(amount);
+
+        // when & then
+        mockMvc.perform(patch("/point/{id}/charge", userId)
+                        .contentType(MediaType.APPLICATION_JSON) // JSON 타입은 그대로 유지
+                        .content(plainRequestBody))             // 단순 숫자 전달
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.point").value(initPoint + amount)); // 결과 값 검증
+    }
+
+    @Test
+    void 포인트_사용_서비스_호출() throws Exception {
+        // given
+        long userId = 1L;
+        long amount = 500L;
+        long initPoint = pointServiceFacade.getUserPoint(userId).point();
+
+        // 단순 숫자를 요청 바디로 전달
+        String plainRequestBody = String.valueOf(amount);
+
+        // when & then
+        mockMvc.perform(patch("/point/{id}/use", userId)
+                        .contentType(MediaType.APPLICATION_JSON) // JSON 타입은 그대로 유지
+                        .content(plainRequestBody))             // 단순 숫자 전달
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.point").value(initPoint - amount)); // 결과 값 검증
+    }
+
     @Nested
-    @DisplayName("포인트 충전 요청 테스트")
-    class ChargeTest{
-        @Test
-        void 충전_서비스_호출() throws Exception {
-            // given
-            long userId = 1L;
-            long amount = 500L;
-            long initPoint = pointServiceFacade.getUserPoint(userId).point();
-
-            // 단순 숫자를 요청 바디로 전달
-            String plainRequestBody = String.valueOf(amount);
-
-            // when & then
-            mockMvc.perform(patch("/point/{id}/charge", userId)
-                            .contentType(MediaType.APPLICATION_JSON) // JSON 타입은 그대로 유지
-                            .content(plainRequestBody))             // 단순 숫자 전달
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.point").value(initPoint + amount)); // 결과 값 검증
-        }
-
+    @DisplayName("동시성 테스트")
+    class ConcurrencyTest {
         @Test
         void 동시에_여러개_스레드_충전_시도() throws Exception {
             // given
@@ -113,28 +131,6 @@ public class PointControllerIntegrationTest {
             // 포인트 상태 확인
             UserPoint userPoint = pointServiceFacade.getUserPoint(userId);
             assertEquals(initPoint + (amount * numberOfThreads), userPoint.point());
-        }
-    }
-
-    @Nested
-    @DisplayName("포인트 사용 요청 테스트")
-    class UseTest {
-        @Test
-        void 포인트_사용_서비스_호출() throws Exception {
-            // given
-            long userId = 1L;
-            long amount = 500L;
-            long initPoint = pointServiceFacade.getUserPoint(userId).point();
-
-            // 단순 숫자를 요청 바디로 전달
-            String plainRequestBody = String.valueOf(amount);
-
-            // when & then
-            mockMvc.perform(patch("/point/{id}/use", userId)
-                            .contentType(MediaType.APPLICATION_JSON) // JSON 타입은 그대로 유지
-                            .content(plainRequestBody))             // 단순 숫자 전달
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.point").value(initPoint - amount)); // 결과 값 검증
         }
 
         @Test
