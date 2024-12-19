@@ -43,18 +43,21 @@ public class InputValidatorTest {
         void userId_값이_0_이하_일때_IllegalArgumentException(){
             // given
             long userId = -1L;
+            // given
+            long amount = 1L;
 
             // when & then
-            assertThrows(IllegalArgumentException.class, () -> inputValidator.checkInputValue(userId));
+            assertThrows(IllegalArgumentException.class, () -> inputValidator.checkInputValue(userId, amount));
         }
 
         @Test
         void amount_값이_0_이하_일때_IllegalArgumentException(){
             // given
+            long userId = 1L;
             long amount = -1L;
 
             // when & then
-            assertThrows(IllegalArgumentException.class, () -> inputValidator.checkInputValue(amount));
+            assertThrows(IllegalArgumentException.class, () -> inputValidator.checkInputValue(userId, amount));
         }
     }
 }
