@@ -5,17 +5,16 @@ import io.hhplus.tdd.point.UserPoint;
 import io.hhplus.tdd.point.exception.NotEnoughPointException;
 import io.hhplus.tdd.point.exception.PointLimitExceededException;
 import io.hhplus.tdd.point.exception.UserPointNotFoundException;
+import io.hhplus.tdd.point.lock.LockManager;
+import io.hhplus.tdd.point.lock.LockWrapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 @RequiredArgsConstructor
 public class UserPointService {
     private final UserPointTable userPointTable;
-    private final ConcurrentHashMap<Long, ReentrantLock> userPointLocks = new ConcurrentHashMap<>();
+    private final LockManager userPointLocks = new LockManager();
 
     public static final long MAXIMUM_POINT_LIMIT = 100_00_00L;
 
@@ -28,7 +27,7 @@ public class UserPointService {
     }
 
     public UserPoint chargeUserPoint(long userId, long newPoint) {
-        ReentrantLock lock = userPointLocks.computeIfAbsent(userId, k -> new ReentrantLock());
+        LockWrapper lock = userPointLocks.getLock(userId);
 
         try{
             lock.lock();
@@ -54,7 +53,7 @@ public class UserPointService {
     }
 
     public UserPoint unChargeUserPoint(long userId, long newPoint) {
-        ReentrantLock lock = userPointLocks.computeIfAbsent(userId, k -> new ReentrantLock());
+        LockWrapper lock = userPointLocks.getLock(userId);
 
         try{
             lock.lock();

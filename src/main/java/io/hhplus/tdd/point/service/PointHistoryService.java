@@ -3,25 +3,25 @@ package io.hhplus.tdd.point.service;
 import io.hhplus.tdd.database.PointHistoryTable;
 import io.hhplus.tdd.point.PointHistory;
 import io.hhplus.tdd.point.TransactionType;
+import io.hhplus.tdd.point.lock.LockManager;
+import io.hhplus.tdd.point.lock.LockWrapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantLock;
 
 @Service
 @RequiredArgsConstructor
 public class PointHistoryService {
     private final PointHistoryTable pointHistoryTable;
-    private final ConcurrentHashMap<Long, ReentrantLock> pointHistoryLock = new ConcurrentHashMap<>();
+    private final LockManager pointHistoryLock = new LockManager();
 
     public List<PointHistory> getPointHistory(long userId) {
         return pointHistoryTable.selectAllByUserId(userId);
     }
 
     public void savePointHistory(long userId, long point, TransactionType transactionType) {
-        ReentrantLock lock = pointHistoryLock.computeIfAbsent(userId, k -> new ReentrantLock());
+        LockWrapper lock = pointHistoryLock.getLock(userId);
 
         try{
             lock.lock();
