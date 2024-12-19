@@ -2,6 +2,7 @@ package io.hhplus.tdd.point;
 
 import io.hhplus.tdd.database.PointHistoryTable;
 import io.hhplus.tdd.database.UserPointTable;
+import io.hhplus.tdd.point.exception.NotEnoughPointException;
 import io.hhplus.tdd.point.exception.PointLimitExceededException;
 import io.hhplus.tdd.point.exception.UserPointNotFoundException;
 import org.junit.jupiter.api.DisplayName;
@@ -170,6 +171,19 @@ public class PointServiceTest {
 
             // when & then
             assertThrows(UserPointNotFoundException.class, () -> pointService.unChargeUserPoint(userId, 100L));
+        }
+
+        @Test
+        void 포인트_사용_포인트_모자라면_NotEnoughPointException(){
+            // given
+            long userId = 1L;
+            long originPoint = 50L;
+            long usePoint = 100L;
+            UserPoint userPoint = new UserPoint(userId, originPoint, System.currentTimeMillis());
+            when(userPointTable.selectById(userId)).thenReturn(userPoint);
+
+            // when & then
+            assertThrows(NotEnoughPointException.class, () -> pointService.unChargeUserPoint(userId, usePoint));
         }
     }
 }
