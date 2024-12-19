@@ -2,6 +2,7 @@ package io.hhplus.tdd.point;
 
 import io.hhplus.tdd.database.PointHistoryTable;
 import io.hhplus.tdd.database.UserPointTable;
+import io.hhplus.tdd.point.exception.PointLimitExceededException;
 import io.hhplus.tdd.point.exception.UserPointNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -87,5 +88,22 @@ public class PointServiceTest {
             // then
             assertTrue(actualHistories.isEmpty());
         }
+    }
+
+    @Nested
+    @DisplayName("포인트 충전 서비스 테스트")
+    class ChargeUserPointTest{
+        @Test
+        void 포인트_충전_한도초과_PointLimitExceededException() {
+            // given
+            long userId = 1L;
+            long newPoint = 100 * 100 * 101L;
+            UserPoint userPoint = UserPoint.empty(userId);
+            when(userPointTable.selectById(userId)).thenReturn(userPoint);
+
+            // when & then
+            assertThrows(PointLimitExceededException.class, () -> pointService.chargeUserPoint(userId, newPoint));
+        }
+
     }
 }
