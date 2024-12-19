@@ -163,5 +163,48 @@ public class PointControllerIntegrationTest {
             UserPoint userPoint = pointServiceFacade.getUserPoint(userId);
             assertEquals(initPoint - (amount * numberOfThreads), userPoint.point());
         }
+
+        @Test
+        void 동시에_충전_사용_시도() throws InterruptedException {
+            // given
+            long userId = 1L;
+            int chargeThreads = 5;
+            int useThreads = 4;
+            int totalThreads = chargeThreads + useThreads;
+            long chargeAmount = 100L;
+            long useAmount = 50L;
+            long initPoint = pointServiceFacade.getUserPoint(userId).point();
+
+            // 스레드 풀 생성
+            ExecutorService executorService = Executors.newFixedThreadPool(totalThreads);
+            // 진행 중인 스레드 갯수 관리
+            CountDownLatch latch = new CountDownLatch(totalThreads);
+
+            // when
+            for(int i = 0; i < chargeThreads; i++){
+                executorService.execute(() -> {
+                    pointServiceFacade.chargeUserPoint(userId, chargeAmount);
+                    System.out.println("Charged: " + chargeAmount);
+                    latch.countDown();
+                });
+            }
+
+            for(int i = 0; i < useThreads; i++){
+                executorService.execute(() -> {
+                    pointServiceFacade.unChargeUserPoint(userId, useAmount);
+                    System.out.println("used: " + useAmount);
+                    latch.countDown();
+                });
+            }
+
+            // 모든 스레드가 끝날때까지 기다림
+            latch.await();
+            executorService.shutdown();
+
+            // then
+            // 포인트 상태 확인
+            UserPoint userPoint = pointServiceFacade.getUserPoint(userId);
+            assertEquals(initPoint + (chargeAmount * chargeThreads) - (useAmount * useThreads), userPoint.point());
+        }
     }
 }
