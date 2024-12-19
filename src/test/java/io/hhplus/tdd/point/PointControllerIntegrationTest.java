@@ -38,7 +38,9 @@ public class PointControllerIntegrationTest {
     void setUp(){
         mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
         long userId = 1L;
+        long userId2 = 2L;
         pointServiceFacade.chargeUserPoint(userId, 1000);
+        pointServiceFacade.chargeUserPoint(userId2, 1000);
     }
 
     @Test
@@ -205,6 +207,53 @@ public class PointControllerIntegrationTest {
             // 포인트 상태 확인
             UserPoint userPoint = pointServiceFacade.getUserPoint(userId);
             assertEquals(initPoint + (chargeAmount * chargeThreads) - (useAmount * useThreads), userPoint.point());
+        }
+
+        @Test
+        void 여러_사용자_동시_요청() throws Exception {
+            // given
+            long userId1 = 1L;
+            long userId2 = 2L;
+            int user1Threads = 10;
+            int user2Threads = 5;
+            int totalThreads = user1Threads + user2Threads;
+            long amount1 = 100L;
+            long amount2 = 50L;
+            long initPoint1 = pointServiceFacade.getUserPoint(userId1).point();
+            long initPoint2 = pointServiceFacade.getUserPoint(userId2).point();
+
+            // 스레드 풀 생성
+            ExecutorService executorService = Executors.newFixedThreadPool(totalThreads);
+            // 진행 중인 스레드 갯수 관리
+            CountDownLatch latch = new CountDownLatch(totalThreads);
+
+            // when
+            for(int i = 0; i < user1Threads; i++){
+                executorService.execute(() -> {
+                    pointServiceFacade.chargeUserPoint(userId1, amount1);
+                    System.out.println("user1: " + amount1);
+                    latch.countDown();
+                });
+            }
+
+            for(int i = 0; i < user2Threads; i++){
+                executorService.execute(() -> {
+                    pointServiceFacade.unChargeUserPoint(userId2, amount2);
+                    System.out.println("user2: " + amount2);
+                    latch.countDown();
+                });
+            }
+
+            // 모든 스레드가 끝날때까지 기다림
+            latch.await();
+            executorService.shutdown();
+
+            // then
+            // 포인트 상태 확인
+            UserPoint userPoint1 = pointServiceFacade.getUserPoint(userId1);
+            UserPoint userPoint2 = pointServiceFacade.getUserPoint(userId2);
+            assertEquals(initPoint1 + (user1Threads * amount1), userPoint1.point());
+            assertEquals(initPoint2 - (user2Threads * amount2), userPoint2.point());
         }
     }
 }
