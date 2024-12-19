@@ -20,60 +20,57 @@ public class UserPointService {
 
     public UserPoint getUserPoint(long userId) {
         UserPoint userPoint = userPointTable.selectById(userId);
-        if(userPoint == null) {
+        if (userPoint == null) {
             throw new UserPointNotFoundException(userId);
         }
         return userPoint;
     }
 
     public UserPoint chargeUserPoint(long userId, long newPoint) {
-        LockWrapper lock = userPointLocks.getLock(userId);
-
-        try{
-            lock.lock();
-
-            UserPoint userPoint = userPointTable.selectById(userId);
-            UserPoint updatedPoint;
-
-            if (userPoint == null) {
-                updatedPoint = userPointTable.insertOrUpdate(userId, newPoint);
-            } else {
-                long totalPoint = userPoint.point() + newPoint;
-                if (totalPoint > MAXIMUM_POINT_LIMIT) {
-                    throw new PointLimitExceededException(userId);
-                }
-                updatedPoint = userPointTable.insertOrUpdate(userId, totalPoint);
-            }
-
-            return updatedPoint;
-        } finally {
-            lock.unlock();
-        }
-
+        return handlePointUpdate(userId, newPoint, true);
     }
 
     public UserPoint unChargeUserPoint(long userId, long newPoint) {
+        return handlePointUpdate(userId, newPoint, false);
+    }
+
+    private UserPoint handlePointUpdate(long userId, long pointDelta, boolean isCharge) {
         LockWrapper lock = userPointLocks.getLock(userId);
 
-        try{
+        try {
             lock.lock();
 
             UserPoint userPoint = userPointTable.selectById(userId);
-            UserPoint updatedPoint;
-            if (userPoint == null) {
-                throw new UserPointNotFoundException(userId);
-            }else {
-                long totalPoint = userPoint.point() - newPoint;
-                if(totalPoint < 0) {
-                    throw new NotEnoughPointException(userId);
-                }
-                updatedPoint = userPointTable.insertOrUpdate(userId, totalPoint);
+
+            if (isCharge && userPoint == null) {
+                return userPointTable.insertOrUpdate(userId, pointDelta);
             }
 
-            return updatedPoint;
+            validateUserPoint(userId, userPoint, pointDelta, isCharge);
+
+            long updatedPoint = calculateUpdatedPoint(userPoint.point(), pointDelta, isCharge);
+
+            return userPointTable.insertOrUpdate(userId, updatedPoint);
         } finally {
             lock.unlock();
         }
+    }
 
+    private void validateUserPoint(long userId, UserPoint userPoint, long pointDelta, boolean isCharge) {
+        if (userPoint == null && !isCharge) {
+            throw new UserPointNotFoundException(userId);
+        }
+
+        if (!isCharge && userPoint.point() < pointDelta) {
+            throw new NotEnoughPointException(userId);
+        }
+
+        if (isCharge && userPoint != null && userPoint.point() + pointDelta > MAXIMUM_POINT_LIMIT) {
+            throw new PointLimitExceededException(userId);
+        }
+    }
+
+    private long calculateUpdatedPoint(long currentPoint, long pointDelta, boolean isCharge) {
+        return isCharge ? currentPoint + pointDelta : currentPoint - pointDelta;
     }
 }
