@@ -59,5 +59,15 @@ public class InputValidatorTest {
             // when & then
             assertThrows(IllegalArgumentException.class, () -> inputValidator.checkInputValue(userId, amount));
         }
+
+        @Test
+        void userId_amount_값이_둘다_0_초과_일때_성공(){
+            // given
+            long userId = 1L;
+            long amount = 1L;
+
+            // when & then
+            assertDoesNotThrow(() -> inputValidator.checkInputValue(userId, amount));
+        }
     }
 }
