@@ -11,9 +11,7 @@ public class InputValidator {
     }
 
     public void checkInputValue(Long userId, Long amount){
-        if (userId <= 0) {
-            throw new IllegalArgumentException("userId must be greater than 0");
-        }
+        checkInputValue(userId);
 
         if (amount <= 0) {
             throw new IllegalArgumentException("amount must be greater than 0");
