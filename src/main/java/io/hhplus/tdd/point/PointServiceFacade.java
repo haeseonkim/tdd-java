@@ -10,11 +10,11 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class PointServiceFacade {
-    private final UserPointService userPointFacade;
+    private final UserPointService userPointService;
     private final PointHistoryService pointHistoryService;
 
     public UserPoint getUserPoint(long userId) {
-        return userPointFacade.getUserPoint(userId);
+        return userPointService.getUserPoint(userId);
     }
 
     public List<PointHistory> getPointHistory(long userId) {
@@ -23,7 +23,7 @@ public class PointServiceFacade {
 
     public UserPoint chargeUserPoint(long userId, long newPoint) {
         // 1. 포인트 충전
-        UserPoint updatedPoint = userPointFacade.chargeUserPoint(userId, newPoint);
+        UserPoint updatedPoint = userPointService.chargeUserPoint(userId, newPoint);
 
         // 2. 히스토리 insert
         pointHistoryService.savePointHistory(userId, newPoint, TransactionType.CHARGE);
@@ -33,7 +33,7 @@ public class PointServiceFacade {
 
     public UserPoint unChargeUserPoint(long userId, long usePoint) {
         // 1. 포인트 사용
-        UserPoint updatedPoint = userPointFacade.unChargeUserPoint(userId, usePoint);
+        UserPoint updatedPoint = userPointService.unChargeUserPoint(userId, usePoint);
 
         // 2. 히스토리 insert
         pointHistoryService.savePointHistory(userId, usePoint, TransactionType.USE);

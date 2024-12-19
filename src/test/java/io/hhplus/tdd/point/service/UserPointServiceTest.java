@@ -23,7 +23,7 @@ public class UserPointServiceTest {
     private UserPointTable userPointTable;
 
     @InjectMocks
-    private UserPointService userPointFacade;
+    private UserPointService userPointService;
 
     @Nested
     @DisplayName("유저 포인트 조회 서비스 테스트")
@@ -35,7 +35,7 @@ public class UserPointServiceTest {
             when(userPointTable.selectById(userId)).thenReturn(null);
 
             // when & then
-            assertThrows(UserPointNotFoundException.class, () -> userPointFacade.getUserPoint(userId));
+            assertThrows(UserPointNotFoundException.class, () -> userPointService.getUserPoint(userId));
         }
 
         @Test
@@ -45,7 +45,7 @@ public class UserPointServiceTest {
             when(userPointTable.selectById(1L)).thenReturn(userPoint);
 
             // when
-            UserPoint actual = userPointFacade.getUserPoint(1L);
+            UserPoint actual = userPointService.getUserPoint(1L);
 
             // then
             assertEquals(userPoint, actual);
@@ -64,7 +64,7 @@ public class UserPointServiceTest {
             when(userPointTable.selectById(userId)).thenReturn(userPoint);
 
             // when & then
-            assertThrows(PointLimitExceededException.class, () -> userPointFacade.chargeUserPoint(userId, newPoint));
+            assertThrows(PointLimitExceededException.class, () -> userPointService.chargeUserPoint(userId, newPoint));
         }
 
         @Test
@@ -77,7 +77,7 @@ public class UserPointServiceTest {
             when(userPointTable.insertOrUpdate(userId, newPoint)).thenReturn(expectedUserPoint);
 
             // when
-            UserPoint actual = userPointFacade.chargeUserPoint(userId, newPoint);
+            UserPoint actual = userPointService.chargeUserPoint(userId, newPoint);
 
             // then
             assertEquals(expectedUserPoint.id(), actual.id());
@@ -96,7 +96,7 @@ public class UserPointServiceTest {
             when(userPointTable.insertOrUpdate(userId, originalPoint + newPoint)).thenReturn(expectedUserPoint);
 
             // when
-            UserPoint actual = userPointFacade.chargeUserPoint(userId, newPoint);
+            UserPoint actual = userPointService.chargeUserPoint(userId, newPoint);
 
             // then
             assertEquals(expectedUserPoint.id(), actual.id());
@@ -114,7 +114,7 @@ public class UserPointServiceTest {
             when(userPointTable.selectById(userId)).thenReturn(null);
 
             // when & then
-            assertThrows(UserPointNotFoundException.class, () -> userPointFacade.unChargeUserPoint(userId, 100L));
+            assertThrows(UserPointNotFoundException.class, () -> userPointService.unChargeUserPoint(userId, 100L));
         }
 
         @Test
@@ -127,7 +127,7 @@ public class UserPointServiceTest {
             when(userPointTable.selectById(userId)).thenReturn(userPoint);
 
             // when & then
-            assertThrows(NotEnoughPointException.class, () -> userPointFacade.unChargeUserPoint(userId, usePoint));
+            assertThrows(NotEnoughPointException.class, () -> userPointService.unChargeUserPoint(userId, usePoint));
         }
 
         @Test
@@ -142,7 +142,7 @@ public class UserPointServiceTest {
             when(userPointTable.insertOrUpdate(userId, originPoint - usePoint)).thenReturn(expectedUserPoint);
 
             // when
-            UserPoint actual = userPointFacade.unChargeUserPoint(userId, usePoint);
+            UserPoint actual = userPointService.unChargeUserPoint(userId, usePoint);
 
             // then
             assertEquals(expectedUserPoint.id(), actual.id());
