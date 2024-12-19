@@ -20,20 +20,11 @@ public class UserPointService {
     public static final long MAXIMUM_POINT_LIMIT = 100 * 100 * 100;
 
     public UserPoint getUserPoint(long userId) {
-        ReentrantLock lock = userPointLocks.computeIfAbsent(userId, k -> new ReentrantLock());
-        try{
-            lock.lock();
-
-            UserPoint userPoint = userPointTable.selectById(userId);
-            if(userPoint == null) {
-                throw new UserPointNotFoundException(userId);
-            }
-
-            return userPoint;
-
-        }finally {
-            lock.unlock();
+        UserPoint userPoint = userPointTable.selectById(userId);
+        if(userPoint == null) {
+            throw new UserPointNotFoundException(userId);
         }
+        return userPoint;
     }
 
     public UserPoint chargeUserPoint(long userId, long newPoint) {
