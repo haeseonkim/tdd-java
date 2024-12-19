@@ -37,4 +37,15 @@ public class PointControllerIntegrationTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(userId));
     }
+
+    @Test
+    void historyTest() throws Exception {
+        // given
+        long userId = 1L;
+
+        // when & then
+        mockMvc.perform(get("/point/{id}/histories", userId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray());
+    }
 }
