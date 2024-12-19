@@ -105,5 +105,21 @@ public class PointServiceTest {
             assertThrows(PointLimitExceededException.class, () -> pointService.chargeUserPoint(userId, newPoint));
         }
 
+        @Test
+        void 포인트_충전_null_일때_insert_성공() {
+            // given
+            long userId = 1L;
+            long newPoint = 100L;
+            UserPoint expectedUserPoint = new UserPoint(userId, newPoint, System.currentTimeMillis());
+            when(userPointTable.selectById(userId)).thenReturn(null);
+            when(userPointTable.insertOrUpdate(userId, newPoint)).thenReturn(expectedUserPoint);
+
+            // when
+            UserPoint actual = pointService.chargeUserPoint(userId, newPoint);
+
+            // then
+            assertEquals(expectedUserPoint, actual);
+        }
+
     }
 }
