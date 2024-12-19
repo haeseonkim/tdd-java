@@ -121,5 +121,23 @@ public class PointServiceTest {
             assertEquals(expectedUserPoint, actual);
         }
 
+        @Test
+        void 포인트_충전_update_성공(){
+            // given
+            long userId = 1L;
+            long originalPoint = 100L;
+            long newPoint = 200L;
+            UserPoint userPoint = new UserPoint(userId, originalPoint, System.currentTimeMillis());
+            UserPoint expectedUserPoint = new UserPoint(userId, originalPoint + newPoint, System.currentTimeMillis());
+            when(userPointTable.selectById(userId)).thenReturn(userPoint);
+            when(userPointTable.insertOrUpdate(userId, originalPoint + newPoint)).thenReturn(expectedUserPoint);
+
+            // when
+            UserPoint actual = pointService.chargeUserPoint(userId, newPoint);
+
+            // then
+            assertEquals(expectedUserPoint, actual);
+        }
+
     }
 }
