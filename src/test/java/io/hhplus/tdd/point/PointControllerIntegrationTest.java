@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
@@ -65,6 +66,23 @@ public class PointControllerIntegrationTest {
     @Nested
     @DisplayName("포인트 충전 요청 테스트")
     class ChargeTest{
+        @Test
+        void 충전_서비스_호출() throws Exception {
+            // given
+            long userId = 1L;
+            long amount = 500L;
+            long initPoint = pointServiceFacade.getUserPoint(userId).point();
+
+            // 단순 숫자를 요청 바디로 전달
+            String plainRequestBody = String.valueOf(amount);
+
+            // when & then
+            mockMvc.perform(patch("/point/{id}/charge", userId)
+                            .contentType(MediaType.APPLICATION_JSON) // JSON 타입은 그대로 유지
+                            .content(plainRequestBody))             // 단순 숫자 전달
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.point").value(initPoint + amount)); // 결과 값 검증
+        }
 
         @Test
         void 동시에_여러개_스레드_충전_시도() throws Exception {
