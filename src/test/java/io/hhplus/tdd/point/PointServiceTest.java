@@ -185,5 +185,31 @@ public class PointServiceTest {
             // when & then
             assertThrows(NotEnoughPointException.class, () -> pointService.unChargeUserPoint(userId, usePoint));
         }
+
+        @Test
+        void 포인트_사용_성공(){
+            // given
+            long userId = 1L;
+            long originPoint = 150L;
+            long usePoint = 100L;
+            UserPoint userPoint = new UserPoint(userId, originPoint, System.currentTimeMillis());
+            UserPoint expectedUserPoint = new UserPoint(userId, originPoint - usePoint, System.currentTimeMillis());
+            when(userPointTable.selectById(userId)).thenReturn(userPoint);
+            when(userPointTable.insertOrUpdate(userId, originPoint - usePoint)).thenReturn(expectedUserPoint);
+
+            // when
+            UserPoint actual = pointService.unChargeUserPoint(userId, usePoint);
+
+            // then
+            assertEquals(expectedUserPoint.id(), actual.id());
+            assertEquals(expectedUserPoint.point(), actual.point());
+            // 히스토리 insert 호출 검증
+            verify(pointHistoryTable).insert(
+                    eq(userId),
+                    eq(usePoint),
+                    eq(TransactionType.USE),
+                    anyLong()
+            );
+        }
     }
 }
