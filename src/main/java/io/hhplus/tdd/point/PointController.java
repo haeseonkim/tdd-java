@@ -13,6 +13,7 @@ import java.util.List;
 public class PointController {
 
     private final PointServiceFacade pointServiceFacade;
+    private final InputValidator inputValidator;
 
     private static final Logger log = LoggerFactory.getLogger(PointController.class);
 
@@ -23,6 +24,7 @@ public class PointController {
     public UserPoint point(
             @PathVariable long id
     ) {
+        inputValidator.checkInputValue(id);
         return pointServiceFacade.getUserPoint(id);
     }
 
@@ -33,6 +35,7 @@ public class PointController {
     public List<PointHistory> history(
             @PathVariable long id
     ) {
+        inputValidator.checkInputValue(id);
         return pointServiceFacade.getPointHistory(id);
     }
 
@@ -44,6 +47,7 @@ public class PointController {
             @PathVariable long id,
             @RequestBody long amount
     ) {
+        inputValidator.checkInputValue(id, amount);
         return pointServiceFacade.chargeUserPoint(id, amount);
     }
 
@@ -55,6 +59,7 @@ public class PointController {
             @PathVariable long id,
             @RequestBody long amount
     ) {
+        inputValidator.checkInputValue(id, amount);
         return pointServiceFacade.unChargeUserPoint(id, amount);
     }
 }
