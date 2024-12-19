@@ -15,12 +15,12 @@ import java.util.concurrent.locks.ReentrantLock;
 @RequiredArgsConstructor
 public class UserPointService {
     private final UserPointTable userPointTable;
-    private final ConcurrentHashMap<Long, ReentrantLock> userLocks = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<Long, ReentrantLock> userPointLocks = new ConcurrentHashMap<>();
 
     public static final long MAXIMUM_POINT_LIMIT = 100 * 100 * 100;
 
     public UserPoint getUserPoint(long userId) {
-        ReentrantLock lock = userLocks.computeIfAbsent(userId, k -> new ReentrantLock());
+        ReentrantLock lock = userPointLocks.computeIfAbsent(userId, k -> new ReentrantLock());
         try{
             lock.lock();
 
@@ -37,7 +37,7 @@ public class UserPointService {
     }
 
     public UserPoint chargeUserPoint(long userId, long newPoint) {
-        ReentrantLock lock = userLocks.computeIfAbsent(userId, k -> new ReentrantLock());
+        ReentrantLock lock = userPointLocks.computeIfAbsent(userId, k -> new ReentrantLock());
 
         try{
             lock.lock();
@@ -63,7 +63,7 @@ public class UserPointService {
     }
 
     public UserPoint unChargeUserPoint(long userId, long newPoint) {
-        ReentrantLock lock = userLocks.computeIfAbsent(userId, k -> new ReentrantLock());
+        ReentrantLock lock = userPointLocks.computeIfAbsent(userId, k -> new ReentrantLock());
 
         try{
             lock.lock();
