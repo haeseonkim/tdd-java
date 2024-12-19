@@ -10,10 +10,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 public class InputValidatorTest {
+
+    private final InputValidator inputValidator = new InputValidator();
+
     @Nested
     @DisplayName("userId에 대한 입력값 테스트")
     class CheckInputValueTest{
-        private InputValidator inputValidator = new InputValidator();
 
         @Test
         void userId_값이_0_이하_일때_IllegalArgumentException(){
@@ -31,6 +33,28 @@ public class InputValidatorTest {
 
             // when & then
             assertDoesNotThrow(() -> inputValidator.checkInputValue(userId));
+        }
+    }
+
+    @Nested
+    @DisplayName("userId, newPoint 둘다에 대한 입력값 테스트")
+    class BothCheckInputValueTest{
+        @Test
+        void userId_값이_0_이하_일때_IllegalArgumentException(){
+            // given
+            long userId = -1L;
+
+            // when & then
+            assertThrows(IllegalArgumentException.class, () -> inputValidator.checkInputValue(userId));
+        }
+
+        @Test
+        void amount_값이_0_이하_일때_IllegalArgumentException(){
+            // given
+            long amount = -1L;
+
+            // when & then
+            assertThrows(IllegalArgumentException.class, () -> inputValidator.checkInputValue(amount));
         }
     }
 }
