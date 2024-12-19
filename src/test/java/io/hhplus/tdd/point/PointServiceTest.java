@@ -157,6 +157,19 @@ public class PointServiceTest {
                     anyLong()
             );
         }
+    }
 
+    @Nested
+    @DisplayName("포인트 사용 서비스 테스트")
+    class UnChargeUserPointTest {
+        @Test
+        void 포인트_사용_포인트_null이면_UserPointNotFoundException(){
+            // given
+            long userId = 1L;
+            when(userPointTable.selectById(userId)).thenReturn(null);
+
+            // when & then
+            assertThrows(UserPointNotFoundException.class, () -> pointService.unChargeUserPoint(userId, 100L));
+        }
     }
 }
