@@ -115,4 +115,39 @@ public class PointControllerIntegrationTest {
             assertEquals(initPoint + (amount * numberOfThreads), userPoint.point());
         }
     }
+
+    @Nested
+    @DisplayName("포인트 사용 요청 테스트")
+    class UseTest {
+        @Test
+        void 동시에_여러개_스레드_포인트_사용_시도() throws Exception {
+            // given
+            long userId = 1L;
+            int numberOfThreads = 10;
+            long amount = 100L;
+            long initPoint = pointServiceFacade.getUserPoint(userId).point();
+
+            // 스레드 풀 생성
+            ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
+            // 진행 중인 스레드 갯수 관리
+            CountDownLatch latch = new CountDownLatch(numberOfThreads);
+
+            // when
+            for(int i = 0; i < numberOfThreads; i++){
+                executorService.execute(() -> {
+                    pointServiceFacade.unChargeUserPoint(userId, amount);
+                    latch.countDown();
+                });
+            }
+
+            // 모든 스레드가 끝날때까지 기다림
+            latch.await();
+            executorService.shutdown();
+
+            // then
+            // 포인트 상태 확인
+            UserPoint userPoint = pointServiceFacade.getUserPoint(userId);
+            assertEquals(initPoint - (amount * numberOfThreads), userPoint.point());
+        }
+    }
 }
