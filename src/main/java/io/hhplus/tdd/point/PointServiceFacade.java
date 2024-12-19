@@ -1,7 +1,7 @@
 package io.hhplus.tdd.point;
 
-import io.hhplus.tdd.point.facade.PointHistoryFacade;
-import io.hhplus.tdd.point.facade.UserPointFacade;
+import io.hhplus.tdd.point.service.PointHistoryService;
+import io.hhplus.tdd.point.service.UserPointService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -9,16 +9,16 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class PointService {
-    private final UserPointFacade userPointFacade;
-    private final PointHistoryFacade pointHistoryFacade;
+public class PointServiceFacade {
+    private final UserPointService userPointFacade;
+    private final PointHistoryService pointHistoryService;
 
     public UserPoint getUserPoint(long userId) {
         return userPointFacade.getUserPoint(userId);
     }
 
     public List<PointHistory> getPointHistory(long userId) {
-        return pointHistoryFacade.getPointHistory(userId);
+        return pointHistoryService.getPointHistory(userId);
     }
 
     public UserPoint chargeUserPoint(long userId, long newPoint) {
@@ -26,7 +26,7 @@ public class PointService {
         UserPoint updatedPoint = userPointFacade.chargeUserPoint(userId, newPoint);
 
         // 2. 히스토리 insert
-        pointHistoryFacade.savePointHistory(userId, newPoint, TransactionType.CHARGE);
+        pointHistoryService.savePointHistory(userId, newPoint, TransactionType.CHARGE);
 
         return updatedPoint;
     }
@@ -36,7 +36,7 @@ public class PointService {
         UserPoint updatedPoint = userPointFacade.unChargeUserPoint(userId, usePoint);
 
         // 2. 히스토리 insert
-        pointHistoryFacade.savePointHistory(userId, usePoint, TransactionType.USE);
+        pointHistoryService.savePointHistory(userId, usePoint, TransactionType.USE);
 
         return updatedPoint;
     }

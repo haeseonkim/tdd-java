@@ -1,4 +1,4 @@
-package io.hhplus.tdd.point.facade;
+package io.hhplus.tdd.point.service;
 
 import io.hhplus.tdd.database.PointHistoryTable;
 import io.hhplus.tdd.point.PointHistory;
@@ -10,7 +10,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class PointHistoryFacade {
+public class PointHistoryService {
     private final PointHistoryTable pointHistoryTable;
 
     public List<PointHistory> getPointHistory(long userId) {

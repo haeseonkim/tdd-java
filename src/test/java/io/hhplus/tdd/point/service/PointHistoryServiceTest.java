@@ -1,4 +1,4 @@
-package io.hhplus.tdd.point.facade;
+package io.hhplus.tdd.point.service;
 
 import io.hhplus.tdd.database.PointHistoryTable;
 import io.hhplus.tdd.point.PointHistory;
@@ -20,13 +20,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class PointHistoryFacadeTest {
+public class PointHistoryServiceTest {
 
     @Mock
     private PointHistoryTable pointHistoryTable;
 
     @InjectMocks
-    private PointHistoryFacade pointHistoryFacade;
+    private PointHistoryService pointHistoryService;
 
     @Nested
     @DisplayName("유저 포인트 히스토리 조회 서비스 테스트")
@@ -42,7 +42,7 @@ public class PointHistoryFacadeTest {
             when(pointHistoryTable.selectAllByUserId(userId)).thenReturn(expectedHistories);
 
             // when
-            List<PointHistory> actualHistories = pointHistoryFacade.getPointHistory(userId);
+            List<PointHistory> actualHistories = pointHistoryService.getPointHistory(userId);
 
             // then
             assertEquals(expectedHistories, actualHistories);
@@ -55,7 +55,7 @@ public class PointHistoryFacadeTest {
             when(pointHistoryTable.selectAllByUserId(userId)).thenReturn(List.of());
 
             // when
-            List<PointHistory> actualHistories = pointHistoryFacade.getPointHistory(userId);
+            List<PointHistory> actualHistories = pointHistoryService.getPointHistory(userId);
 
             // then
             assertTrue(actualHistories.isEmpty());
@@ -73,7 +73,7 @@ public class PointHistoryFacadeTest {
             TransactionType transactionType = TransactionType.CHARGE;
 
             // when
-            pointHistoryFacade.savePointHistory(userId, newPoint, transactionType);
+            pointHistoryService.savePointHistory(userId, newPoint, transactionType);
 
             // then
             verify(pointHistoryTable).insert(

@@ -1,4 +1,4 @@
-package io.hhplus.tdd.point.facade;
+package io.hhplus.tdd.point.service;
 
 import io.hhplus.tdd.database.UserPointTable;
 import io.hhplus.tdd.point.UserPoint;
@@ -17,13 +17,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class UserPointFacadeTest {
+public class UserPointServiceTest {
 
     @Mock
     private UserPointTable userPointTable;
 
     @InjectMocks
-    private UserPointFacade userPointFacade;
+    private UserPointService userPointFacade;
 
     @Nested
     @DisplayName("유저 포인트 조회 서비스 테스트")
