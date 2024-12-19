@@ -15,6 +15,9 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -118,7 +121,15 @@ public class PointServiceTest {
             UserPoint actual = pointService.chargeUserPoint(userId, newPoint);
 
             // then
-            assertEquals(expectedUserPoint, actual);
+            assertEquals(expectedUserPoint.id(), actual.id());
+            assertEquals(expectedUserPoint.point(), actual.point());
+            // 히스토리 insert 호출 검증
+            verify(pointHistoryTable).insert(
+                    eq(userId),
+                    eq(newPoint),
+                    eq(TransactionType.CHARGE),
+                    anyLong()
+            );
         }
 
         @Test
@@ -136,7 +147,15 @@ public class PointServiceTest {
             UserPoint actual = pointService.chargeUserPoint(userId, newPoint);
 
             // then
-            assertEquals(expectedUserPoint, actual);
+            assertEquals(expectedUserPoint.id(), actual.id());
+            assertEquals(expectedUserPoint.point(), actual.point());
+            // 히스토리 insert 호출 검증
+            verify(pointHistoryTable).insert(
+                    eq(userId),
+                    eq(newPoint),
+                    eq(TransactionType.CHARGE),
+                    anyLong()
+            );
         }
 
     }
