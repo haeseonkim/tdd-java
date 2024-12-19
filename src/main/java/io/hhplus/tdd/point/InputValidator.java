@@ -10,16 +10,16 @@ public class InputValidator {
         }
     }
 
-    public void checkInputValue(Long userId, Long newPoint){
+    public void checkInputValue(Long userId, Long amount){
         if (userId <= 0) {
             throw new IllegalArgumentException("userId must be greater than 0");
         }
 
-        if (newPoint == null) {
+        if (amount == null) {
             throw new IllegalArgumentException("amount cannot be null");
         }
 
-        if (newPoint <= 0) {
+        if (amount <= 0) {
             throw new IllegalArgumentException("amount must be greater than 0");
         }
     }
