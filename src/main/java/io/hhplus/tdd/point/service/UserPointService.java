@@ -17,7 +17,7 @@ public class UserPointService {
     private final UserPointTable userPointTable;
     private final ConcurrentHashMap<Long, ReentrantLock> userPointLocks = new ConcurrentHashMap<>();
 
-    public static final long MAXIMUM_POINT_LIMIT = 100 * 100 * 100;
+    public static final long MAXIMUM_POINT_LIMIT = 100_00_00L;
 
     public UserPoint getUserPoint(long userId) {
         UserPoint userPoint = userPointTable.selectById(userId);
