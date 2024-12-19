@@ -66,7 +66,7 @@ public class PointService {
         }
 
         // 2. 히스토리 insert
-        pointHistoryTable.insert(userId, newPoint, TransactionType.CHARGE, System.currentTimeMillis());
+        pointHistoryTable.insert(userId, newPoint, TransactionType.USE, System.currentTimeMillis());
 
         return updatedPoint;
     }
