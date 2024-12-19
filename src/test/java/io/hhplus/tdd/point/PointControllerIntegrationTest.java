@@ -29,9 +29,6 @@ public class PointControllerIntegrationTest {
     @Autowired
     private WebApplicationContext context;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
     private MockMvc mockMvc;
 
     @BeforeEach

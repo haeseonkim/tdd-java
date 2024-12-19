@@ -33,7 +33,7 @@ class ApiControllerAdvice extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(value = Exception.class)
-    public ResponseEntity<ErrorResponse> handleException(Exception e) {
+    public ResponseEntity<ErrorResponse> handleException() {
         return ResponseEntity.status(500).body(new ErrorResponse("500", "에러가 발생했습니다."));
     }
 }
